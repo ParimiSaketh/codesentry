@@ -44,8 +44,15 @@ No build command; publish directory is the repo root.
 
 ## Project structure
 
-    index.html      Landing page
-    assets/         CSS, JS, images (ready for when you split inline styles/scripts out)
+    codesentry/
+├── index.html          # the landing page
+├── assets/
+│   ├── css/            # if/when you split styles out of <style>
+│   ├── js/             # if/when you split the <script> out
+│   └── img/            # logo, og-image, favicons
+├── .gitignore
+├── README.md
+└── LICENSE             # optional — omit for all-rights-reserved
 
 ## Roadmap
 
