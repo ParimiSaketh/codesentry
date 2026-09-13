@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Codesentry — The Security Layer for AI-Built Apps</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..900&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#F4F7FF;
+    --ink-2:#FFFFFF;
+    --ink-3:#EAF0FF;
+    --paper:#161B33;
+    --paper-dim:#5B6480;
+    --beacon:#0B6FD1;
+    --beacon-dim:#4FA8F0;
+    --safe:#00B389;
+    --danger:#FF5D5D;
+    --line: rgba(22,27,51,0.10);
+    --font-display: 'Fraunces', serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+    --radius: 14px;
+    --shadow: 0 4px 24px rgba(22,27,51,0.06);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--paper);
+    font-family:var(--font-body);
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit;}
+  img,svg{display:block;max-width:100%;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+  h1,h2,h3{font-family:var(--font-display);font-weight:600;letter-spacing:-0.01em;margin:0;}
+  .eyebrow{
+    font-family:var(--font-mono);
+    text-transform:uppercase;
+    font-size:12px;
+    letter-spacing:0.12em;
+    color:var(--beacon);
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:14px;
+  }
+  .eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--beacon);box-shadow:0 0 10px var(--beacon);}
+  button{font-family:var(--font-body);cursor:pointer;}
+  :focus-visible{outline:2px solid var(--beacon);outline-offset:3px;}
+
+  /* ===== NAV ===== */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(244,247,255,0.85);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  nav{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 28px;max-width:1180px;margin:0 auto;
+  }
+  .logo{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-size:20px;font-weight:700;color:#00B389;}
+  .logo-mark{width:26px;height:26px;flex-shrink:0;}
+  .navlinks{display:flex;gap:30px;font-size:14px;font-weight:500;}
+  .navlinks a{opacity:0.75;text-decoration:none;transition:opacity .2s;}
+  .navlinks a:hover{opacity:1;}
+  .navcta{display:flex;gap:12px;align-items:center;}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    padding:11px 22px;border-radius:999px;border:none;
+    font-weight:600;font-size:14px;text-decoration:none;transition:transform .15s, box-shadow .15s;
+  }
+  .btn-beacon{background:var(--beacon);color:#FFFFFF;}
+  .btn-beacon:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(11,111,209,0.35);}
+  .btn-ghost{background:transparent;color:var(--paper);border:1px solid var(--line);}
+  .btn-ghost:hover{border-color:var(--paper-dim);background:var(--ink-3);}
+  .navburger{display:none;background:none;border:none;color:var(--paper);}
+
+  /* ===== HERO ===== */
+  .hero{position:relative;overflow:hidden;padding:90px 0 70px;border-bottom:1px solid var(--line);}
+  .beacon-sweep{
+    position:absolute;inset:-20% -10%;
+    background:conic-gradient(from 0deg at 30% 40%, transparent 0deg, rgba(11,111,209,0.30) 10deg, rgba(0,210,160,0.14) 22deg, transparent 34deg, transparent 360deg);
+    animation:sweep 8s linear infinite;
+    pointer-events:none;
+  }
+  @keyframes sweep{ to{ transform:rotate(360deg); } }
+  @media (prefers-reduced-motion:reduce){ .beacon-sweep{animation:none;} }
+  .hero-grid{position:relative;z-index:2;display:grid;grid-template-columns:1.15fr 0.85fr;gap:56px;align-items:center;}
+  .audience-toggle{
+    display:inline-flex;background:var(--ink-2);border:1px solid var(--line);border-radius:999px;padding:4px;margin-bottom:24px;
+  }
+  .audience-toggle button{
+    border:none;background:none;color:var(--paper-dim);padding:9px 18px;border-radius:999px;font-size:13px;font-weight:600;transition:.2s;
+  }
+  .audience-toggle button.active{background:var(--beacon);color:#FFFFFF;}
+  h1.hero-head{font-size:52px;line-height:1.05;margin-bottom:20px;}
+  h1.hero-head em{font-style:italic;color:var(--beacon);}
+  .hero-sub{font-size:18px;color:var(--paper-dim);max-width:520px;margin-bottom:32px;}
+  .hero-actions{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:18px;}
+  .hero-note{font-size:13px;color:var(--paper-dim);font-family:var(--font-mono);}
+  .hero-note span{color:var(--safe);}
+
+  .url-scan-box{
+    background:var(--ink-2);border:1px solid var(--line);border-radius:var(--radius);
+    padding:8px;display:flex;gap:8px;margin-bottom:8px;max-width:520px;
+  }
+  .url-scan-box input{
+    flex:1;background:none;border:none;color:var(--paper);padding:12px 14px;font-family:var(--font-mono);font-size:14px;
+  }
+  .url-scan-box input:focus{outline:none;}
+  .url-scan-box input::placeholder{color:var(--paper-dim);}
+
+  .hero-visual{
+    background:var(--ink-2);border:1px solid var(--line);border-radius:20px;padding:26px;position:relative;box-shadow:var(--shadow);
+  }
+  .lighthouse-card{
+    background:var(--ink-3);border-radius:12px;padding:20px;font-family:var(--font-mono);font-size:13px;
+  }
+  .score-ring{width:120px;height:120px;margin:0 auto 14px;position:relative;}
+  .score-ring svg{transform:rotate(-90deg);}
+  .score-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;font-family:var(--font-display);font-size:34px;color:var(--paper);}
+  .score-num small{font-family:var(--font-mono);font-size:10px;color:var(--paper-dim);letter-spacing:0.08em;}
+  .lh-row{display:flex;justify-content:space-between;padding:8px 0;border-top:1px solid var(--line);color:var(--paper-dim);}
+  .lh-row b{color:var(--paper);font-weight:500;}
+  .tag-danger{color:var(--danger);}
+  .tag-safe{color:var(--safe);}
+
+  /* ===== TRUST BAR ===== */
+  .trustbar{border-bottom:1px solid var(--line);padding:22px 0;background:var(--ink-2);}
+  .trustbar .wrap{display:flex;flex-wrap:wrap;gap:40px;justify-content:space-between;align-items:center;font-family:var(--font-mono);font-size:13px;color:var(--paper-dim);}
+  .trustbar b{color:var(--beacon);font-size:16px;}
+
+  /* ===== SECTION SHARED ===== */
+  section{padding:96px 0;}
+  .section-head{max-width:680px;margin-bottom:56px;}
+  .section-head h2{font-size:36px;margin-bottom:14px;}
+  .section-head p{color:var(--paper-dim);font-size:17px;}
+  .divider{border-bottom:1px solid var(--line);}
+
+  /* ===== HOW IT WORKS ===== */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
+  .step-card{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow);}
+  .step-num{font-family:var(--font-mono);color:var(--beacon-dim);font-size:13px;margin-bottom:16px;}
+  .step-card h3{font-size:19px;margin-bottom:10px;}
+  .step-card p{color:var(--paper-dim);font-size:14px;margin:0;}
+
+  /* ===== SANDBOX ===== */
+  .sandbox{background:var(--ink-2);border:1px solid var(--line);border-radius:20px;padding:30px;box-shadow:var(--shadow);}
+  .sandbox-top{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;}
+  .sample-chip{
+    background:var(--ink-3);border:1px solid var(--line);border-radius:10px;padding:12px 18px;font-size:14px;font-weight:500;
+    display:flex;align-items:center;gap:8px;
+  }
+  .sample-chip.active{border-color:var(--beacon);background:rgba(11,111,209,0.08);}
+  .sandbox-body{display:grid;grid-template-columns:1fr 1fr;gap:26px;}
+  .code-panel{background:#161B33;border-radius:12px;padding:20px;font-family:var(--font-mono);font-size:12.5px;overflow-x:auto;color:#B7BEDB;box-shadow:var(--shadow);}
+  .code-panel .bad{color:#FF8A8A;}
+  .code-panel .good{color:#3EE8B5;}
+  .plain-toggle{display:flex;align-items:center;gap:10px;font-size:13px;margin-bottom:16px;color:var(--paper-dim);}
+  .switch{position:relative;width:42px;height:24px;background:var(--ink-3);border-radius:999px;border:1px solid var(--line);flex-shrink:0;}
+  .switch::after{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:var(--paper-dim);top:2px;left:2px;transition:.2s;}
+  .switch.on{background:rgba(11,111,209,0.20);border-color:var(--beacon);}
+  .switch.on::after{transform:translateX(18px);background:var(--beacon);}
+  .finding{background:var(--ink-3);border-radius:10px;padding:16px;margin-bottom:12px;border-left:3px solid var(--danger);}
+  .finding.safe{border-left-color:var(--safe);}
+  .finding-head{display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:6px;}
+  .finding p{margin:0;font-size:13.5px;color:var(--paper-dim);}
+  .run-btn{width:100%;margin-top:6px;}
+  .progress-wrap{height:6px;background:var(--ink-3);border-radius:99px;overflow:hidden;margin:16px 0;display:none;}
+  .progress-bar{height:100%;width:0%;background:var(--beacon);transition:width 1.4s ease;}
+
+  /* ===== MODULES ===== */
+  .modules-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  .module-card{
+    background:var(--ink-2);border:1px solid var(--line);border-radius:var(--radius);padding:28px;position:relative;
+  }
+  .module-card .badge-new{
+    position:absolute;top:20px;right:20px;font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;
+    background:rgba(127,209,185,0.15);color:var(--safe);padding:4px 9px;border-radius:6px;text-transform:uppercase;
+  }
+  .module-icon{width:38px;height:38px;border-radius:10px;background:var(--ink-3);display:flex;align-items:center;justify-content:center;margin-bottom:18px;font-size:18px;}
+  .module-card h3{font-size:18px;margin-bottom:10px;}
+  .module-card p{color:var(--paper-dim);font-size:14px;margin:0;}
+
+  /* ===== CHECKLIST TOOL ===== */
+  .checklist-box{background:var(--ink-2);border:1px solid var(--line);border-radius:20px;padding:32px;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center;box-shadow:var(--shadow);}
+  .checklist-items label{
+    display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);font-size:14.5px;cursor:pointer;
+  }
+  .checklist-items input{margin-top:3px;accent-color:var(--beacon);width:16px;height:16px;}
+  .checklist-progress{font-family:var(--font-mono);}
+  .checklist-progress .big-num{font-family:var(--font-display);font-size:56px;color:var(--beacon);}
+  .checklist-bar{height:8px;background:var(--ink-3);border-radius:99px;overflow:hidden;margin:14px 0;}
+  .checklist-bar-fill{height:100%;width:0%;background:var(--safe);transition:width .3s;}
+
+  /* ===== PERSONAS ===== */
+  .persona-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  .persona-card{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);}
+  .persona-tag{font-family:var(--font-mono);font-size:11px;color:var(--beacon);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px;display:block;}
+  .persona-card h3{font-size:20px;margin-bottom:10px;}
+  .persona-card p{color:var(--paper-dim);font-size:14px;}
+
+  /* ===== ROI ===== */
+  .roi-toggle{display:flex;gap:10px;margin-bottom:30px;}
+  .roi-toggle button{
+    background:var(--ink-2);border:1px solid var(--line);color:var(--paper-dim);padding:10px 20px;border-radius:10px;font-size:14px;font-weight:600;
+  }
+  .roi-toggle button.active{border-color:var(--beacon);color:var(--beacon);background:rgba(11,111,209,0.08);}
+  .roi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  .roi-card{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow);}
+  .roi-card .label{font-size:13px;color:var(--paper-dim);margin-bottom:8px;}
+  .roi-card .value{font-family:var(--font-display);font-size:30px;}
+  .roi-card.highlight{border-color:var(--safe);}
+  .roi-card.highlight .value{color:var(--safe);}
+
+  /* ===== COMPARISON ===== */
+  table.compare{width:100%;border-collapse:collapse;background:var(--ink-2);border-radius:var(--radius);overflow:hidden;}
+  table.compare th,table.compare td{padding:16px 20px;text-align:left;border-bottom:1px solid var(--line);font-size:14px;}
+  table.compare th{font-family:var(--font-mono);text-transform:uppercase;font-size:11px;letter-spacing:0.06em;color:var(--paper-dim);background:var(--ink-3);}
+  table.compare td.yes{color:var(--safe);}
+  table.compare td.no{color:var(--paper-dim);}
+  table.compare tr:last-child td{border-bottom:none;}
+  table.compare td:first-child{font-weight:600;}
+
+  /* ===== TESTIMONIALS ===== */
+  .testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  .testi-card{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow);}
+  .testi-card p{font-size:15px;margin-bottom:20px;}
+  .testi-who{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--paper-dim);border-top:1px solid var(--line);padding-top:14px;}
+  .testi-who b{color:var(--paper);display:block;font-size:14px;}
+
+  /* ===== FAQ ===== */
+  .faq-item{border-bottom:1px solid var(--line);padding:20px 0;}
+  .faq-q{display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:16px;font-weight:600;}
+  .faq-a{max-height:0;overflow:hidden;transition:max-height .25s ease;color:var(--paper-dim);font-size:14.5px;}
+  .faq-item.open .faq-a{max-height:200px;margin-top:12px;}
+  .faq-plus{font-family:var(--font-mono);color:var(--beacon);transition:transform .2s;}
+  .faq-item.open .faq-plus{transform:rotate(45deg);}
+
+  /* ===== FINAL CTA ===== */
+  .final-cta{
+    background:linear-gradient(180deg, var(--ink-2), var(--ink));
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    text-align:center;padding:100px 0;
+  }
+  .final-cta h2{font-size:40px;max-width:700px;margin:0 auto 18px;}
+  .final-cta p{color:var(--paper-dim);margin-bottom:34px;}
+
+  footer{padding:44px 0;}
+  .footer-grid{display:flex;justify-content:space-between;flex-wrap:wrap;gap:20px;font-size:13px;color:var(--paper-dim);}
+  .footer-links{display:flex;gap:24px;}
+  .footer-links a{text-decoration:none;opacity:0.8;}
+
+  @media (max-width: 900px){
+    .navlinks{display:none;}
+    .hero-grid{grid-template-columns:1fr;}
+    h1.hero-head{font-size:36px;}
+    .steps{grid-template-columns:1fr 1fr;}
+    .modules-grid{grid-template-columns:1fr;}
+    .sandbox-body{grid-template-columns:1fr;}
+    .checklist-box{grid-template-columns:1fr;}
+    .persona-grid{grid-template-columns:1fr;}
+    .roi-grid{grid-template-columns:1fr;}
+    .testi-grid{grid-template-columns:1fr;}
+    table.compare{font-size:12px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <div class="logo">
+      <svg class="logo-mark" viewBox="0 0 72 72" fill="none"><path d="M46 14 H30 A18 18 0 1 0 48 32 V26 H36" fill="none" stroke="#0B6FD1" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="32" r="7" fill="#00D2A0"/></svg>
+      Codesentry
+    </div>
+    <div class="navlinks">
+      <a href="#how-it-works">How it works</a>
+      <a href="#sandbox">Try a scan</a>
+      <a href="#modules">Features</a>
+      <a href="#checklist">Free checklist</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div class="navcta">
+      <a class="btn btn-ghost" href="#sandbox">See a sample report</a>
+      <a class="btn btn-beacon" href="#hero">Scan my site free</a>
+    </div>
+  </nav>
+</header>
+
+<section class="hero" id="hero">
+  <div class="beacon-sweep"></div>
+  <div class="wrap hero-grid">
+    <div>
+      <div class="audience-toggle" role="tablist" aria-label="Choose your view">
+        <button class="active" data-view="plain">I'm not a developer</button>
+        <button data-view="tech">I'm technical</button>
+      </div>
+      <h1 class="hero-head" id="heroHead">You built it with AI. <em>Let's make sure it's safe</em> before the world sees it.</h1>
+      <p class="hero-sub" id="heroSub">Paste your website link. In under a minute, Codesentry tells you — in plain English — what's unsafe, why it matters, and exactly how to fix it. No coding, no GitHub account, no jargon.</p>
+
+      <div class="url-scan-box">
+        <input type="text" placeholder="paste your site link, e.g. myapp.vercel.app" aria-label="Website URL">
+        <button class="btn btn-beacon" style="white-space:nowrap;">Scan free</button>
+      </div>
+      <div class="hero-note"><span>●</span> No credit card &nbsp;·&nbsp; No install &nbsp;·&nbsp; Works with Lovable, Cursor, Bolt, v0, Replit, Windsurf</div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="lighthouse-card">
+        <div class="score-ring">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="52" stroke="#EAF0FF" stroke-width="10" fill="none"/>
+            <circle cx="60" cy="60" r="52" stroke="#0B6FD1" stroke-width="10" fill="none" stroke-dasharray="327" stroke-dashoffset="72" stroke-linecap="round"/>
+          </svg>
+          <div class="score-num">78<small>SAFETY SCORE</small></div>
+        </div>
+        <div class="lh-row"><span>Login &amp; accounts</span><b class="tag-safe">Safe</b></div>
+        <div class="lh-row"><span>Payment setup</span><b class="tag-danger">Needs fix</b></div>
+        <div class="lh-row"><span>Customer data storage</span><b class="tag-danger">Needs fix</b></div>
+        <div class="lh-row"><span>Search visibility (SEO)</span><b class="tag-safe">Safe</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="trustbar">
+  <div class="wrap">
+    <div><b>12,480</b> sites scanned this month</div>
+    <div><b>96%</b> of fixes explained in plain English, no dev needed</div>
+    <div><b>4 min</b> average time to your first fix</div>
+    <div><b>0</b> lines of code you have to write yourself</div>
+  </div>
+</div>
+
+<section id="how-it-works">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">How it works</span>
+      <h2>Three steps. Zero jargon.</h2>
+      <p>Built for people who shipped an app in a weekend using AI — not for security engineers. If you can copy and paste a link, you can use this.</p>
+    </div>
+    <div class="steps">
+      <div class="step-card">
+        <div class="step-num">01</div>
+        <h3>Paste your link</h3>
+        <p>No GitHub connection required. Just drop in your live site's web address — the one you'd send a friend.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">02</div>
+        <h3>We check it quietly</h3>
+        <p>Codesentry looks for the exact mistakes AI tools like Lovable, Bolt and Cursor commonly leave behind — nothing is downloaded or stored.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">03</div>
+        <h3>Get a plain-English report</h3>
+        <p>Every issue is explained like you're hearing it from a friend, not a manual: what's wrong, why it matters, what happens if you ignore it.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">04</div>
+        <h3>Fix it your way</h3>
+        <p>Copy a ready-made fix into Cursor or Claude, hand it to a developer, or click "fix it for me" if you connected a repo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="divider" id="sandbox">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Try it now — no signup</span>
+      <h2>See what a real report looks like</h2>
+      <p>Pick a sample project below and run a scan. Flip the switch to see the same finding explained two ways: developer language, and plain English.</p>
+    </div>
+    <div class="sandbox">
+      <div class="sandbox-top">
+        <div class="sample-chip active" data-sample="shop">🛍️ Sample online store</div>
+        <div class="sample-chip" data-sample="booking">📅 Sample booking app</div>
+        <div class="sample-chip" data-sample="community">💬 Sample community app</div>
+      </div>
+      <button class="btn btn-beacon run-btn" id="runScanBtn">Run sample scan</button>
+      <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
+
+      <div class="sandbox-body" id="sandboxResults" style="display:none;">
+        <div>
+          <div class="plain-toggle">
+            <div class="switch on" id="plainSwitch"></div>
+            Explain like I'm not a developer
+          </div>
+          <div class="finding">
+            <div class="finding-head"><span>Payment prices can be changed by the customer</span><span class="tag-danger">Critical</span></div>
+            <p class="findText" data-plain="A shopper could edit the price of an item in their browser before paying — meaning they could buy a $200 item for $1. We check every price on our own server before charging." data-tech="Client-supplied price is trusted at checkout without server-side re-validation against the product catalog, allowing price tampering via DOM/network edits.">A shopper could edit the price of an item in their browser before paying — meaning they could buy a $200 item for $1. We check every price on our own server before charging.</p>
+          </div>
+          <div class="finding">
+            <div class="finding-head"><span>Customer records are open to anyone</span><span class="tag-danger">Critical</span></div>
+            <p class="findText" data-plain="Your database of customer names, emails and orders currently has no lock on it — anyone who finds the address can read it. We add the missing lock." data-tech="Missing Row Level Security (RLS) policy on the orders and customers tables allows unauthenticated reads via the public API endpoint.">Your database of customer records currently has no lock on it — anyone who finds the address can read it. We add the missing lock.</p>
+          </div>
+          <div class="finding safe">
+            <div class="finding-head"><span>Login and sign-up</span><span class="tag-safe">Looks good</span></div>
+            <p class="findText" data-plain="Your sign-up and login screens are set up correctly and passwords are stored safely." data-tech="Auth provider correctly hashes credentials and enforces session expiry; no action needed.">Your sign-up and login screens are set up correctly and passwords are stored safely.</p>
+          </div>
+        </div>
+        <div class="code-panel" id="codePanel">
+<pre style="margin:0;white-space:pre-wrap;"><span style="color:#8A93B0">// what your AI tool generated</span>
+<span class="bad">const price = req.body.price;
+await charge(customerId, price);</span>
+
+<span style="color:#8A93B0">// what Codesentry suggests instead</span>
+<span class="good">const item = await db.getProduct(itemId);
+await charge(customerId, item.serverPrice);</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="modules">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Beyond a basic scanner</span>
+      <h2>What Codesentry does that most scanners don't</h2>
+      <p>Most tools stop at "here's a list of bugs." We built the parts that actually matter if you're not a security expert — or don't want to become one.</p>
+    </div>
+    <div class="modules-grid">
+      <div class="module-card">
+        <span class="badge-new">New</span>
+        <div class="module-icon">💬</div>
+        <h3>Plain-English mode, everywhere</h3>
+        <p>Every single finding has a one-click toggle between developer language and "explain it to me simply." No other scanner does this on every result, not just the summary.</p>
+      </div>
+      <div class="module-card">
+        <span class="badge-new">New</span>
+        <div class="module-icon">🔎</div>
+        <h3>Search &amp; AI-visibility check</h3>
+        <p>We also check whether Google — and AI answer engines like ChatGPT — can actually find and understand your site. Security and visibility, one scan.</p>
+      </div>
+      <div class="module-card">
+        <span class="badge-new">New</span>
+        <div class="module-icon">🛎️</div>
+        <h3>Ongoing watch + trust badge</h3>
+        <p>Turn on weekly re-checks and get a "Verified by Codesentry" badge to place on your site — reassurance for your customers, and an alert to you the moment something changes.</p>
+      </div>
+      <div class="module-card">
+        <div class="module-icon">✅</div>
+        <h3>Free pre-launch checklist</h3>
+        <p>Don't want a full scan yet? Work through our interactive checklist before you launch — no account needed. See the live example below.</p>
+      </div>
+      <div class="module-card">
+        <div class="module-icon">🔌</div>
+        <h3>Works inside your AI tool</h3>
+        <p>Technical users can trigger scans directly from Cursor or Claude Code and get results without leaving the editor.</p>
+      </div>
+      <div class="module-card">
+        <div class="module-icon">📊</div>
+        <h3>Public, checkable scoring</h3>
+        <p>We publish exactly how our scoring works and test it against known-safe and known-unsafe sample sites, so the score means something — not a black box number.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="divider" id="checklist">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Free tool · no signup</span>
+      <h2>Not ready for a full scan? Start here.</h2>
+      <p>Tick these off before you launch anything you built with AI. Takes about three minutes.</p>
+    </div>
+    <div class="checklist-box">
+      <div class="checklist-items" id="checklistItems">
+        <label><input type="checkbox"> I removed any test passwords or "admin/admin" logins</label>
+        <label><input type="checkbox"> My payment prices are checked on the server, not just the browser</label>
+        <label><input type="checkbox"> Customer data can only be seen by that customer, not everyone</label>
+        <label><input type="checkbox"> My API keys are not visible in the website's public code</label>
+        <label><input type="checkbox"> I turned off "debug mode" before launch</label>
+        <label><input type="checkbox"> I have a way to know if something breaks (basic monitoring)</label>
+      </div>
+      <div class="checklist-progress">
+        <div class="label">Launch readiness</div>
+        <div class="big-num" id="checklistPct">0%</div>
+        <div class="checklist-bar"><div class="checklist-bar-fill" id="checklistBar"></div></div>
+        <p style="color:var(--paper-dim);font-size:14px;">Finish the checklist, then run a full scan to catch what a checklist can't — the issues hiding in your actual code.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Who this is for</span>
+      <h2>Built for the AI-app generation</h2>
+      <p>Whichever one you are, the report speaks your language.</p>
+    </div>
+    <div class="persona-grid">
+      <div class="persona-card">
+        <span class="persona-tag">Solo founders</span>
+        <h3>You built your MVP in a weekend</h3>
+        <p>You used Lovable or Bolt to go from idea to live app fast. You don't have a security background, and you shouldn't need one to launch safely. We tell you exactly what to fix, in your language.</p>
+      </div>
+      <div class="persona-card">
+        <span class="persona-tag">Agencies &amp; freelancers</span>
+        <h3>You deliver AI-built sites to clients</h3>
+        <p>Attach a Codesentry report — and the trust badge — to every handoff. It's proof you didn't just ship something that looks done; it's proof it's actually safe.</p>
+      </div>
+      <div class="persona-card">
+        <span class="persona-tag">Small dev &amp; product teams</span>
+        <h3>You review a lot of AI-generated code</h3>
+        <p>Connect a repo for auto-generated fix pull requests, or trigger scans right from Cursor or Claude Code. Technical mode gives you the full detail, not the simplified version.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="divider" id="pricing">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">The math</span>
+      <h2>What a mistake costs vs. what a scan costs</h2>
+      <p>Pick your team size to see typical numbers.</p>
+    </div>
+    <div class="roi-toggle">
+      <button class="active" data-tier="solo">Solo / side project</button>
+      <button data-tier="growth">Small team (5–15 people)</button>
+      <button data-tier="agency">Agency (multiple client sites)</button>
+    </div>
+    <div class="roi-grid" id="roiGrid">
+      <div class="roi-card">
+        <div class="label">Cost of a hired security review</div>
+        <div class="value" id="roiOld">$3,500+</div>
+      </div>
+      <div class="roi-card">
+        <div class="label">Codesentry plan</div>
+        <div class="value" id="roiNew">Free – $19/mo</div>
+      </div>
+      <div class="roi-card highlight">
+        <div class="label">Typical savings</div>
+        <div class="value" id="roiSave">$3,480+</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Why not just use anything else</span>
+      <h2>How this compares</h2>
+    </div>
+    <table class="compare">
+      <tr><th>Question</th><th>Doing it yourself</th><th>Typical code-only scanner</th><th>Codesentry</th></tr>
+      <tr><td>Do I need to know how to code?</td><td class="no">Usually yes</td><td class="no">Often yes</td><td class="yes">No</td></tr>
+      <tr><td>Do I need a GitHub account?</td><td class="no">N/A</td><td class="no">Usually required</td><td class="yes">Optional</td></tr>
+      <tr><td>Explained in plain English?</td><td class="no">—</td><td class="no">Rarely</td><td class="yes">Every finding</td></tr>
+      <tr><td>Checks search/AI visibility too?</td><td class="no">No</td><td class="no">No</td><td class="yes">Yes</td></tr>
+      <tr><td>Typical cost</td><td class="no">$3,000–$50,000</td><td class="no">$19–99/mo</td><td class="yes">Free first scan</td></tr>
+      <tr><td>Time to result</td><td class="no">1–6 weeks</td><td class="no">Minutes</td><td class="yes">Under 1 minute</td></tr>
+    </table>
+  </div>
+</section>
+
+<section class="divider">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">From people who tried it</span>
+      <h2>What early users say</h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card">
+        <p>"I've never written a line of code. Codesentry told me my customer list was wide open, in one sentence I actually understood, and told me what to paste into Lovable's chat to fix it."</p>
+        <div class="testi-who"><div><b>Priya N.</b>Solo founder, meal-planning app</div></div>
+      </div>
+      <div class="testi-card">
+        <p>"We attach the report to every client project now. It's turned into a selling point, not a chore."</p>
+        <div class="testi-who"><div><b>Owen Marsh</b>Founder, small web studio</div></div>
+      </div>
+      <div class="testi-card">
+        <p>"The technical view is genuinely detailed — I can hand the plain-English one to my client and keep the real one for myself."</p>
+        <div class="testi-who"><div><b>Jae Lin</b>Freelance developer</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Questions</span>
+      <h2>Before you scan</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item open">
+        <div class="faq-q">Do I need to know how to code to use this? <span class="faq-plus">+</span></div>
+        <div class="faq-a">No. Paste your site's link and read the plain-English report. If you want a fix done for you automatically, that part does need a connected GitHub repo — but it's optional.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Will this slow down or break my live site? <span class="faq-plus">+</span></div>
+        <div class="faq-a">No. Scanning only reads your site the way a visitor's browser would; it never changes anything unless you approve a fix yourself.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What AI tools does this work with? <span class="faq-plus">+</span></div>
+        <div class="faq-a">Any site, regardless of what built it — including apps made with Lovable, Cursor, Bolt, v0, Replit, and Windsurf.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Is my data kept private? <span class="faq-plus">+</span></div>
+        <div class="faq-a">Yes. We don't sell or share scan results, and code is never used to train AI models.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What does it cost? <span class="faq-plus">+</span></div>
+        <div class="faq-a">Your first scan is free. Ongoing weekly monitoring and the trust badge start at $19/month.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="final-cta">
+  <div class="wrap">
+    <h2>You already did the hard part — you shipped something. Now make sure it's safe.</h2>
+    <p>Free first scan. No credit card. Plain English, guaranteed.</p>
+    <a class="btn btn-beacon" href="#hero" style="padding:16px 34px;font-size:15px;">Scan my site free</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap footer-grid">
+    <div>Codesentry — the security layer for apps built with AI. © 2026</div>
+    <div class="footer-links">
+      <a href="#how-it-works">How it works</a>
+      <a href="#checklist">Free checklist</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Audience toggle
+  const heroHead = document.getElementById('heroHead');
+  const heroSub = document.getElementById('heroSub');
+  const copies = {
+    plain: {
+      head: 'You built it with AI. <em>Let\'s make sure it\'s safe</em> before the world sees it.',
+      sub: 'Paste your website link. In under a minute, Codesentry tells you — in plain English — what\'s unsafe, why it matters, and exactly how to fix it. No coding, no GitHub account, no jargon.'
+    },
+    tech: {
+      head: 'Ship AI-generated code. <em>Catch what the model missed.</em>',
+      sub: 'Connect a repo or scan a live URL. Get an AST-aware security audit tuned to Lovable/Cursor/Bolt/v0 failure modes, with SARIF export and auto-generated fix PRs.'
+    }
+  };
+  document.querySelectorAll('.audience-toggle button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.audience-toggle button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const v = copies[btn.dataset.view];
+      heroHead.innerHTML = v.head;
+      heroSub.textContent = v.sub;
+    });
+  });
+
+  // Sample chips
+  document.querySelectorAll('.sample-chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      document.querySelectorAll('.sample-chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      document.getElementById('sandboxResults').style.display = 'none';
+      document.getElementById('progressWrap').style.display = 'none';
+      document.getElementById('progressBar').style.width = '0%';
+    });
+  });
+
+  // Run scan
+  document.getElementById('runScanBtn').addEventListener('click', ()=>{
+    const wrap = document.getElementById('progressWrap');
+    const bar = document.getElementById('progressBar');
+    wrap.style.display = 'block';
+    bar.style.width = '0%';
+    setTimeout(()=>{ bar.style.width = '100%'; }, 50);
+    setTimeout(()=>{
+      document.getElementById('sandboxResults').style.display = 'grid';
+    }, 1500);
+  });
+
+  // Plain-English switch
+  const plainSwitch = document.getElementById('plainSwitch');
+  plainSwitch.addEventListener('click', ()=>{
+    plainSwitch.classList.toggle('on');
+    const isPlain = plainSwitch.classList.contains('on');
+    document.querySelectorAll('.findText').forEach(el=>{
+      el.textContent = isPlain ? el.dataset.plain : el.dataset.tech;
+    });
+  });
+
+  // Checklist
+  const checklistItems = document.querySelectorAll('#checklistItems input');
+  const checklistPct = document.getElementById('checklistPct');
+  const checklistBar = document.getElementById('checklistBar');
+  function updateChecklist(){
+    const total = checklistItems.length;
+    const done = Array.from(checklistItems).filter(i=>i.checked).length;
+    const pct = Math.round((done/total)*100);
+    checklistPct.textContent = pct + '%';
+    checklistBar.style.width = pct + '%';
+  }
+  checklistItems.forEach(i=>i.addEventListener('change', updateChecklist));
+
+  // ROI toggle
+  const roiData = {
+    solo:   { old: '$3,500+',  new: 'Free – $19/mo', save: '$3,480+' },
+    growth: { old: '$18,000+', new: '$49/mo',        save: '$17,400+' },
+    agency: { old: '$45,000+', new: '$99/mo',        save: '$43,800+' }
+  };
+  document.querySelectorAll('.roi-toggle button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.roi-toggle button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const d = roiData[btn.dataset.tier];
+      document.getElementById('roiOld').textContent = d.old;
+      document.getElementById('roiNew').textContent = d.new;
+      document.getElementById('roiSave').textContent = d.save;
+    });
+  });
+
+  // FAQ accordion
+  document.querySelectorAll('.faq-item').forEach(item=>{
+    item.querySelector('.faq-q').addEventListener('click', ()=>{
+      item.classList.toggle('open');
+    });
+  });
+</script>
+</body>
+</html>
